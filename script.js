@@ -4,7 +4,7 @@ const nomNaelle = "Naelle";
 const tangerCoords = [35.7595, -5.8340];
 const targetCoords = [48.8566, 2.3522];
 
-// Initialisation de la carte Leaflet (Retour animation originale simple)
+// Initialisation de la carte Leaflet
 const map = L.map('map', { zoomControl: false }).setView([42, -1], 5);
 
 L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
@@ -46,16 +46,18 @@ function goToNextScreen(screenId) {
   document.getElementById(screenId).classList.add('active');
 }
 
-// Déclenchement du hack et de l'avion
+// Déclenchement direct du hack puis de l'avion
 function triggerLockError() {
   const hackOverlay = document.getElementById('hack-overlay');
   
-  hackOverlay.classList.remove('hidden');
+  if (hackOverlay) {
+    hackOverlay.classList.remove('hidden');
 
-  setTimeout(() => {
-    hackOverlay.classList.add('hidden');
-    launchPlaneAnimation();
-  }, 3800);
+    setTimeout(() => {
+      hackOverlay.classList.add('hidden');
+      launchPlaneAnimation();
+    }, 3800);
+  }
 }
 
 function launchPlaneAnimation() {
@@ -84,12 +86,3 @@ function launchPlaneAnimation() {
     }
   }, 20);
 }
-
-// Attachement des clics sur la porte et le bouton
-document.addEventListener('DOMContentLoaded', () => {
-  const padlock = document.getElementById('padlock');
-  const unlockBtn = document.getElementById('unlock-btn');
-
-  if (padlock) padlock.addEventListener('click', triggerLockError);
-  if (unlockBtn) unlockBtn.addEventListener('click', triggerLockError);
-});
