@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deux villes, une histoire ❤️</title>
+  <link rel="stylesheet" href="style.css?v=700">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body>
+
+  <section id="screen-map" class="screen active">
+    <div id="map"></div>
+    <div class="overlay-content">
+      <div id="quote-1" class="text-fade">« Peu importe la distance… »</div>
+      <div id="quote-2" class="text-fade">« …il y avait toujours un chemin entre nous. ❤️ »</div>
+      <div id="poem" class="text-fade">
+        <p>Deux villes.</p>
+        <p>Deux vies.</p>
+        <p>Une histoire.</p>
+      </div>
+      <button id="next-btn" class="hidden" onclick="goToNextScreen('screen-story')">CONTINUER NOTRE VOYAGE →</button>
+    </div>
+  </section>
+
+  <!-- ÉCRAN 2 : MOTIFS MAXIMALES ET TRÈS CLAIRS -->
+  <section id="screen-story" class="screen">
+    <div class="cute-decorations">
+      <span class="decor d1">🐱</span>
+      <span class="decor d2">🌸</span>
+      <span class="decor d3">💕</span>
+      <span class="decor d4">🐾</span>
+      <span class="decor d5">✨</span>
+      <span class="decor d6">🌺</span>
+      <span class="decor d7">🐱</span>
+      <span class="decor d8">💖</span>
+      <span class="decor d9">🎀</span>
+      <span class="decor d10">🌷</span>
+      <span class="decor d11">🐾</span>
+      <span class="decor d12">✨</span>
+      <span class="decor d13">💗</span>
+      <span class="decor d14">🌸</span>
+      <span class="decor d15">🐱</span>
+      <span class="decor d16">💕</span>
+    </div>
+    <div class="story-container">
+      <h2>Notre Histoire 💬</h2>
+      <p class="final-poem">
+        Entre Tanger et ta ville, s’étendent des kilomètres,<br>
+        comme une frontière dessinée entre deux horizons.<br>
+        Deux villes, deux chemins, deux vies qui semblaient destinées à ne jamais se rencontrer.<br><br>
+        Et pourtant, au détour d’un message, d’un regard derrière un écran,<br>
+        nos trajectoires se sont entremêlées.<br><br>
+        Depuis, la distance n’est plus seulement une mesure :<br>
+        elle est devenue l’attente d’un jour à venir.<br><br>
+        Un jour où les kilomètres s’effaceront,<br>
+        où les écrans deviendront inutiles,<br>
+        où deux chemins, après s’être longtemps cherchés,<br>
+        se rejoindront enfin.<br><br>
+        Alors, au cœur de cette carte,<br>
+        il n’y aura plus de distance à parcourir,<br>
+        seulement une histoire à continuer. ❤️
+      </p>
+      <button class="suite-btn" onclick="goToNextScreen('screen-lock')">SUITE →</button>
+    </div>
+  </section>
+
+  <section id="screen-lock" class="screen">
+    <div class="lock-container">
+      <div id="padlock" class="door-lock-wrapper" onclick="triggerLockError()">
+        <span class="door">🚪</span>
+        <span class="chains">⛓️</span>
+        <span class="lock">🔒</span>
+      </div>
+      <button class="click-here-btn" onclick="triggerLockError()">Clique ici</button>
+      <div id="error-message" class="error-popup hidden">
+        ⚠️ Cette porte ne pourra s'ouvrir que quand nous aurons pris notre première photo ensemble.
+      </div>
+    </div>
+  </section>
+
+  <div id="smoke-overlay" class="smoke-overlay"></div>
+  <div id="plane-wrapper" class="plane-wrapper">
+    <div class="smoke-trail"></div>
+    <div class="plane-icon">✈️</div>
+  </div>
+
+  <section id="screen-final" class="screen">
+    <div class="final-container">
+      <h1 class="love-message">Je t'aime ma Naelle ❤️</h1>
+    </div>
+  </section>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="script.js?v=700"></script>
+</body>
+</html>
