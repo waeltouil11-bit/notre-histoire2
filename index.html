@@ -4,26 +4,28 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Deux villes, une histoire ❤️</title>
-  <link rel="stylesheet" href="style.css?v=700">
+  <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
+  <!-- ÉCRAN 1 : CARTE -->
   <section id="screen-map" class="screen active">
     <div id="map"></div>
     <div class="overlay-content">
       <div id="quote-1" class="text-fade">« Peu importe la distance… »</div>
       <div id="quote-2" class="text-fade">« …il y avait toujours un chemin entre nous. ❤️ »</div>
       <div id="poem" class="text-fade">
-        <p>Deux villes.</p>
-        <p>Deux vies.</p>
-        <p>Une histoire.</p>
+        <p class="poem-intro">Deux villes. Deux vies. Une seule histoire.</p>
       </div>
-      <button id="next-btn" class="hidden" onclick="goToNextScreen('screen-story')">CONTINUER NOTRE VOYAGE →</button>
+      <button id="next-btn" class="hidden glow-btn" onclick="goToNextScreen('screen-story')">
+        CONTINUER NOTRE VOYAGE ✨
+      </button>
     </div>
   </section>
 
-  <!-- ÉCRAN 2 : MOTIFS MAXIMALES ET TRÈS CLAIRS -->
+  <!-- ÉCRAN 2 : POÈME & MOTIFS MIGNONS -->
   <section id="screen-story" class="screen">
     <div class="cute-decorations">
       <span class="decor d1">🐱</span>
@@ -38,60 +40,80 @@
       <span class="decor d10">🌷</span>
       <span class="decor d11">🐾</span>
       <span class="decor d12">✨</span>
-      <span class="decor d13">💗</span>
-      <span class="decor d14">🌸</span>
-      <span class="decor d15">🐱</span>
-      <span class="decor d16">💕</span>
     </div>
-    <div class="story-container">
-      <h2>Notre Histoire 💬</h2>
-      <p class="final-poem">
-        Entre Tanger et ta ville, s’étendent des kilomètres,<br>
-        comme une frontière dessinée entre deux horizons.<br>
-        Deux villes, deux chemins, deux vies qui semblaient destinées à ne jamais se rencontrer.<br><br>
-        Et pourtant, au détour d’un message, d’un regard derrière un écran,<br>
-        nos trajectoires se sont entremêlées.<br><br>
-        Depuis, la distance n’est plus seulement une mesure :<br>
-        elle est devenue l’attente d’un jour à venir.<br><br>
-        Un jour où les kilomètres s’effaceront,<br>
-        où les écrans deviendront inutiles,<br>
-        où deux chemins, après s’être longtemps cherchés,<br>
-        se rejoindront enfin.<br><br>
-        Alors, au cœur de cette carte,<br>
-        il n’y aura plus de distance à parcourir,<br>
-        seulement une histoire à continuer. ❤️
-      </p>
-      <button class="suite-btn" onclick="goToNextScreen('screen-lock')">SUITE →</button>
+
+    <div class="story-card">
+      <h2 class="story-title">Notre Histoire 💬</h2>
+      <div class="poem-wrapper">
+        <p class="final-poem">
+          Entre Tanger et ta ville, s’étendent des kilomètres,<br>
+          comme une frontière dessinée entre deux horizons.<br>
+          Deux villes, deux chemins, deux vies qui semblaient destinées à ne jamais se rencontrer.<br><br>
+          Et pourtant, au détour d’un message, d’un regard derrière un écran,<br>
+          nos trajectoires se sont entremêlées.<br><br>
+          Depuis, la distance n’est plus seulement une mesure :<br>
+          elle est devenue l’attente d’un jour à venir.<br><br>
+          Un jour où les kilomètres s’effaceront,<br>
+          où les écrans deviendront inutiles,<br>
+          où deux chemins, après s’être longtemps cherchés,<br>
+          se rejoindront enfin.<br><br>
+          Alors, au cœur de cette carte,<br>
+          il n’y aura plus de distance à parcourir,<br>
+          seulement une histoire à continuer. ❤️
+        </p>
+      </div>
+      <button class="glow-btn suite-btn" onclick="goToNextScreen('screen-lock')">LA SUITE... 🔑</button>
     </div>
   </section>
 
+  <!-- ÉCRAN 3 : PORTE VERROUILLÉE -->
   <section id="screen-lock" class="screen">
     <div class="lock-container">
-      <div id="padlock" class="door-lock-wrapper" onclick="triggerLockError()">
-        <span class="door">🚪</span>
-        <span class="chains">⛓️</span>
-        <span class="lock">🔒</span>
-      </div>
-      <button class="click-here-btn" onclick="triggerLockError()">Clique ici</button>
-      <div id="error-message" class="error-popup hidden">
-        ⚠️ Cette porte ne pourra s'ouvrir que quand nous aurons pris notre première photo ensemble.
+      <div class="lock-card">
+        <div id="padlock" class="door-lock-wrapper" onclick="triggerLockError()">
+          <span class="door">🚪</span>
+          <span class="chains">⛓️</span>
+          <span class="lock">🔒</span>
+        </div>
+        <p class="lock-hint">Une porte magique barre le passage...</p>
+        <button class="click-here-btn" onclick="triggerLockError()">Essayer d'ouvrir ✨</button>
       </div>
     </div>
   </section>
 
+  <!-- OVERLAY PIRATAGE / HACK ENVAHISSANT -->
+  <div id="hack-overlay" class="hack-overlay hidden">
+    <div class="hack-content">
+      <div class="hack-icon">⚠️ SYSTEM ERROR ⚠️</div>
+      <h1 class="hack-title">TÉLÉPHONE VERROUILLÉ !</h1>
+      <p class="hack-message">
+        ACCÈS REFUSÉ 🚫<br><br>
+        Cette porte est sécurisée par un protocole indestructible.<br><br>
+        Elle ne pourra s'ouvrir que lorsque nous aurons pris <strong>notre toute première photo ensemble !</strong> 📸❤️
+      </p>
+      <div class="hack-status">RECONFIGURATION DU SYSTÈME EN COURS...</div>
+    </div>
+  </div>
+
+  <!-- ANIMATION AVION -->
   <div id="smoke-overlay" class="smoke-overlay"></div>
   <div id="plane-wrapper" class="plane-wrapper">
     <div class="smoke-trail"></div>
     <div class="plane-icon">✈️</div>
   </div>
 
+  <!-- ÉCRAN FINAL -->
   <section id="screen-final" class="screen">
     <div class="final-container">
-      <h1 class="love-message">Je t'aime ma Naelle ❤️</h1>
+      <div class="final-card">
+        <div class="heart-pulse">💖</div>
+        <h1 class="love-message">Je t'aime ma Naelle ❤️</h1>
+        <p class="sub-love-message">Pour toujours & à jamais ✨</p>
+      </div>
     </div>
   </section>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="script.js?v=700"></script>
+  <script src="script.js"></script>
 </body>
 </html>
