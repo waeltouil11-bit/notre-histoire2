@@ -70,13 +70,13 @@
   <section id="screen-lock" class="screen">
     <div class="lock-container">
       <div class="lock-card">
-        <div id="padlock" class="door-lock-wrapper">
+        <div id="padlock" class="door-lock-wrapper" onclick="triggerLockError()">
           <span class="door">🚪</span>
           <span class="chains">⛓️</span>
           <span class="lock">🔒</span>
         </div>
         <p class="lock-hint">Une porte magique barre le passage...</p>
-        <button id="unlock-btn" class="click-here-btn">Essayer d'ouvrir ✨</button>
+        <button id="unlock-btn" class="click-here-btn" onclick="triggerLockError()">Essayer d'ouvrir ✨</button>
       </div>
     </div>
   </section>
