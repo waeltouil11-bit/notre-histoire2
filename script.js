@@ -19,27 +19,27 @@ setTimeout(() => {
   tangerMarker.bindTooltip(`📍 Tanger — ${monPrenom}`, { permanent: true, direction: 'top', className: 'custom-name-label' }).openTooltip();
   targetMarker.bindTooltip(`📍 France — ${nomNaelle}`, { permanent: true, direction: 'top', className: 'custom-name-label' }).openTooltip();
 
-  // Deux lignes distinctes qui se construisent en même temps
+  // Deux lignes dessinées simultanément
   const lineWael = L.polyline([], { color: '#ff4d6d', weight: 4.5, opacity: 0.95, lineCap: 'round', lineJoin: 'round' }).addTo(map);
   const lineNaelle = L.polyline([], { color: '#ff4d6d', weight: 4.5, opacity: 0.95, lineCap: 'round', lineJoin: 'round' }).addTo(map);
 
-  // Points clés pour la trajectoire de Wael (Moitié gauche du cœur)
+  // Points de passage pour la trajectoire de Wael (Part de Tanger -> Croise à droite -> Bosse droite -> Creux central)
   const pathWaelControl = [
-    tangerCoords,      // Départ : Tanger
-    [41.0, -4.5],      // Croisement bas
-    [45.5, -6.0],      // Bosse gauche du cœur
-    [43.5, -2.5]       // Creux central (Fin)
+    tangerCoords,      // Départ : Tanger (Bas-Gauche)
+    [40.5, 0.5],       // Point de croisement bas (Vers la droite)
+    [46.5, 0.8],       // Bosse droite du cœur
+    [44.0, -2.5]       // Creux central (Jonction)
   ];
 
-  // Points clés pour la trajectoire de Naelle (Moitié droite du cœur)
+  // Points de passage pour la trajectoire de Naelle (Part de France -> Croise à gauche -> Bosse gauche -> Creux central)
   const pathNaelleControl = [
-    targetCoords,      // Départ : France
-    [41.0, -0.5],      // Croisement bas
-    [46.5, -0.2],      // Bosse droite du cœur
-    [43.5, -2.5]       // Creux central (Fin)
+    targetCoords,      // Départ : France (Haut-Droit)
+    [40.5, -5.5],      // Point de croisement bas (Vers la gauche)
+    [45.5, -5.8],      // Bosse gauche du cœur
+    [44.0, -2.5]       // Creux central (Jonction)
   ];
 
-  // Interpolation de courbe (Catmull-Rom)
+  // Générateur de trajectoire fluide (Interpolation Bézier / Catmull-Rom)
   function getInterpolatedPoints(points, samples) {
     const result = [];
     for (let i = 0; i < points.length - 1; i++) {
@@ -62,13 +62,13 @@ setTimeout(() => {
     return result;
   }
 
-  const fullPathWael = getInterpolatedPoints(pathWaelControl, 40);
-  const fullPathNaelle = getInterpolatedPoints(pathNaelleControl, 40);
+  const fullPathWael = getInterpolatedPoints(pathWaelControl, 50);
+  const fullPathNaelle = getInterpolatedPoints(pathNaelleControl, 50);
 
   let step = 0;
   const maxSteps = Math.max(fullPathWael.length, fullPathNaelle.length);
 
-  // Animation synchrone des deux lignes
+  // Animation synchrone exacte
   const animInterval = setInterval(() => {
     if (step < fullPathWael.length) {
       lineWael.addLatLng(fullPathWael[step]);
