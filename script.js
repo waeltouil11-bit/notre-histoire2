@@ -27,14 +27,14 @@ setTimeout(() => {
   const centerLat = 42.5;
   const centerLng = -2.0;
 
-  // Calcul du cœur (3x plus grand que la version précédente)
-  const stepsHeart = 60;
+  // Calcul du cœur géant (2x la version précédente)
+  const stepsHeart = 70;
   const heartPointsLeft = [];
   const heartPointsRight = [];
 
-  // Multiplicateurs d'échelle x3
-  const scaleLat = 0.66;
-  const scaleLng = 0.96;
+  // Multiplicateurs d'échelle agrandis (2x la version précédente)
+  const scaleLat = 1.32;
+  const scaleLng = 1.92;
 
   for (let i = 0; i <= stepsHeart; i++) {
     const t = (i / stepsHeart) * Math.PI;
@@ -44,14 +44,14 @@ setTimeout(() => {
     const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
 
     // Côté gauche (Wael)
-    heartPointsLeft.push([centerLat + (y / 16) * scaleLat + 1.2, centerLng - (x / 16) * scaleLng]);
+    heartPointsLeft.push([centerLat + (y / 16) * scaleLat + 2.0, centerLng - (x / 16) * scaleLng]);
 
     // Côté droit (Naelle)
-    heartPointsRight.push([centerLat + (y / 16) * scaleLat + 1.2, centerLng + (x / 16) * scaleLng]);
+    heartPointsRight.push([centerLat + (y / 16) * scaleLat + 2.0, centerLng + (x / 16) * scaleLng]);
   }
 
   // Étape 1 : Approche des villes vers la pointe inférieure du cœur
-  const approachSteps = 35;
+  const approachSteps = 40;
   const startHeartBaseLeft = heartPointsLeft[heartPointsLeft.length - 1];  // Pointe du bas
   const startHeartBaseRight = heartPointsRight[heartPointsRight.length - 1]; // Pointe du bas
 
@@ -91,7 +91,7 @@ setTimeout(() => {
       step++;
     } else {
       clearInterval(animInterval);
-      map.flyTo([centerLat, centerLng], 5, { duration: 2 });
+      map.flyTo([centerLat, centerLng], 4, { duration: 2 });
 
       setTimeout(() => document.getElementById('quote-1').classList.add('visible'), 800);
       setTimeout(() => document.getElementById('quote-2').classList.add('visible'), 2400);
