@@ -5,7 +5,7 @@ const tangerCoords = [35.7595, -5.8340];
 const targetCoords = [48.8566, 2.3522];
 
 // Initialisation de la carte Leaflet
-const map = L.map('map', { zoomControl: false }).setView([42.5, -1.8], 5);
+const map = L.map('map', { zoomControl: false }).setView([42.5, -2.5], 5);
 
 L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
   maxZoom: 19,
@@ -23,76 +23,98 @@ setTimeout(() => {
   const lineWael = L.polyline([], { color: '#ff4d6d', weight: 4.5, opacity: 0.95, lineCap: 'round', lineJoin: 'round' }).addTo(map);
   const lineNaelle = L.polyline([], { color: '#ff4d6d', weight: 4.5, opacity: 0.95, lineCap: 'round', lineJoin: 'round' }).addTo(map);
 
-  // Centre exact du cœur
-  const centerLat = 42.5;
-  const centerLng = -1.8;
+  // Génération des demi-cercles inclinés vers la gauche
+  const samples = 60;
+  const pathWael = [];
+  const pathNaelle = [];
 
-  // Trajectoire Wael : Tanger -> Bas du cœur (croisement) -> Bosse Gauche -> Creux du Cœur
-  const pathWaelControl = [
-    tangerCoords,
-    [centerLat - 2.5, centerLng],     // Pointe bas du cœur (point de croisement)
-    [centerLat + 1.2, centerLng - 3.2], // Bosse supérieure gauche
-    [centerLat - 0.2, centerLng]      // Creux supérieur du cœur (Jonction)
-  ];
+  // Paramètres du cœur incliné vers la gauche
+  const basePoint = [39.5, -2.0];  // Pointe inférieure (croisement)
+  const innerCrease = [44.0, -3.5]; // Creux supérieur du cœur
 
-  // Trajectoire Naelle : France -> Bas du cœur (croisement) -> Bosse Droite -> Creux du Cœur
-  const pathNaelleControl = [
-    targetCoords,
-    [centerLat - 2.5, centerLng],     // Pointe bas du cœur (point de croisement)
-    [centerLat + 1.2, centerLng + 3.2], // Bosse supérieure droite
-    [centerLat - 0.2, centerLng]      // Creux supérieur du cœur (Jonction)
-  ];
+  // 1. Trajectoire de Wael : Tanger -> Ligne vers pointe bas -> Demi-cercle gauchi -> Creux
+  for (let i = 0; i <= samples; i++) {
+    const t = i / samples;
+    if (t <= 0.35) {
+      // Approche de Tanger vers la pointe du bas
+      const subT = t / 0.35;
+      const lat = tangerCoords[0] + (basePoint[0] - tangerCoords[0]) * subT;
+      const lng = tangerCoords[1] + (basePoint[1] - tangerCoords[1]) * subT;
+      pathWael.push([lat, lng]);
+    } else {
+      // Arc de demi-cercle pour la bosse gauche (inclinée)
+      const subT = (t - 0.35) / 0.65;
+      const angle = Math.PI * subT;
+      
+      const radius = 2.4;
+      const centerLat = 42.0;
+      const centerLng = -4.8;
+      
+      // Rotation pour l'inclinaison vers la gauche (-25 degrés)
+      const tilt = -0.45; 
+      const rawLat = -Math.sin(angle) * radius;
+      const rawLng = -Math.cos(angle) * radius;
 
-  // Interpolation fluide (Bézier / Catmull-Rom)
-  function getInterpolatedPoints(points, samples) {
-    const result = [];
-    for (let i = 0; i < points.length - 1; i++) {
-      const p0 = points[Math.max(0, i - 1)];
-      const p1 = points[i];
-      const p2 = points[i + 1];
-      const p3 = points[Math.min(points.length - 1, i + 2)];
-
-      for (let t = 0; t < 1; t += 1 / samples) {
-        const t2 = t * t;
-        const t3 = t2 * t;
-
-        const lat = 0.5 * ((2 * p1[0]) + (-p0[0] + p2[0]) * t + (2 * p0[0] - 5 * p1[0] + 4 * p2[0] - p3[0]) * t2 + (-p0[0] + 3 * p1[0] - 3 * p2[0] + p3[0]) * t3);
-        const lng = 0.5 * ((2 * p1[1]) + (-p0[1] + p2[1]) * t + (2 * p0[1] - 5 * p1[1] + 4 * p2[1] - p3[1]) * t2 + (-p0[1] + 3 * p1[1] - 3 * p2[1] + p3[1]) * t3);
-
-        result.push([lat, lng]);
-      }
+      const lat = centerLat + rawLat * Math.cos(tilt) - rawLng * Math.sin(tilt);
+      const lng = centerLng + rawLat * Math.sin(tilt) + rawLng * Math.cos(tilt);
+      
+      pathWael.push([lat, lng]);
     }
-    result.push(points[points.length - 1]);
-    return result;
   }
 
-  const fullPathWael = getInterpolatedPoints(pathWaelControl, 45);
-  const fullPathNaelle = getInterpolatedPoints(pathNaelleControl, 45);
+  // 2. Trajectoire de Naelle : France -> Ligne vers pointe bas -> Demi-cercle droit -> Creux
+  for (let i = 0; i <= samples; i++) {
+    const t = i / samples;
+    if (t <= 0.35) {
+      // Approche de la France vers la pointe du bas
+      const subT = t / 0.35;
+      const lat = targetCoords[0] + (basePoint[0] - targetCoords[0]) * subT;
+      const lng = targetCoords[1] + (basePoint[1] - targetCoords[1]) * subT;
+      pathNaelle.push([lat, lng]);
+    } else {
+      // Arc de demi-cercle pour la bosse droite (inclinée)
+      const subT = (t - 0.35) / 0.65;
+      const angle = Math.PI * subT;
+      
+      const radius = 2.4;
+      const centerLat = 43.2;
+      const centerLng = -1.2;
+
+      // Rotation pour l'inclinaison vers la gauche
+      const tilt = -0.45;
+      const rawLat = -Math.sin(angle) * radius;
+      const rawLng = Math.cos(angle) * radius;
+
+      const lat = centerLat + rawLat * Math.cos(tilt) - rawLng * Math.sin(tilt);
+      const lng = centerLng + rawLat * Math.sin(tilt) + rawLng * Math.cos(tilt);
+
+      pathNaelle.push([lat, lng]);
+    }
+  }
+
+  // Forcer les deux derniers points à se sceller exactement sur le creux du cœur
+  pathWael[pathWael.length - 1] = innerCrease;
+  pathNaelle[pathNaelle.length - 1] = innerCrease;
 
   let step = 0;
-  const maxSteps = Math.max(fullPathWael.length, fullPathNaelle.length);
+  const maxSteps = pathWael.length;
 
-  // Animation simultanée
+  // Animation synchrone exacte
   const animInterval = setInterval(() => {
-    if (step < fullPathWael.length) {
-      lineWael.addLatLng(fullPathWael[step]);
-    }
-    if (step < fullPathNaelle.length) {
-      lineNaelle.addLatLng(fullPathNaelle[step]);
-    }
-
-    step++;
-
-    if (step >= maxSteps) {
+    if (step < maxSteps) {
+      lineWael.addLatLng(pathWael[step]);
+      lineNaelle.addLatLng(pathNaelle[step]);
+      step++;
+    } else {
       clearInterval(animInterval);
-      map.flyTo([centerLat, centerLng], 5, { duration: 2 });
+      map.flyTo([42.5, -2.5], 5, { duration: 2 });
 
       setTimeout(() => document.getElementById('quote-1').classList.add('visible'), 800);
       setTimeout(() => document.getElementById('quote-2').classList.add('visible'), 2400);
       setTimeout(() => document.getElementById('poem').classList.add('visible'), 4000);
       setTimeout(() => document.getElementById('next-btn').classList.remove('hidden'), 5500);
     }
-  }, 30);
+  }, 25);
 
 }, 1000);
 
@@ -101,7 +123,7 @@ function goToNextScreen(screenId) {
   document.getElementById(screenId).classList.add('active');
 }
 
-// Message d'erreur réglé sur 10 secondes (10000ms)
+// Piratage (10 secondes)
 function triggerLockError() {
   const hackOverlay = document.getElementById('hack-overlay');
   
