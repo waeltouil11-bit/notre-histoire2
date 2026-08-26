@@ -27,38 +27,38 @@ setTimeout(() => {
   const centerLat = 42.5;
   const centerLng = -2.0;
 
-  // Calcul exact des coordonnées du cœur (Équation paramétrique)
-  const stepsHeart = 50;
+  // Calcul du cœur (3x plus grand que la version précédente)
+  const stepsHeart = 60;
   const heartPointsLeft = [];
   const heartPointsRight = [];
 
-  for (let i = 0; i <= stepsHeart; i++) {
-    const t = (i / stepsHeart) * Math.PI; // De 0 à PI
+  // Multiplicateurs d'échelle x3
+  const scaleLat = 0.66;
+  const scaleLng = 0.96;
 
-    // Calcul forme du cœur
+  for (let i = 0; i <= stepsHeart; i++) {
+    const t = (i / stepsHeart) * Math.PI;
+
+    // Équation mathématique du cœur
     const x = 16 * Math.pow(Math.sin(t), 3);
     const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
 
-    // Échelle et position sur la carte
-    const scaleLat = 0.22;
-    const scaleLng = 0.32;
-
     // Côté gauche (Wael)
-    heartPointsLeft.push([centerLat + (y / 16) * scaleLat + 0.5, centerLng - (x / 16) * scaleLng]);
+    heartPointsLeft.push([centerLat + (y / 16) * scaleLat + 1.2, centerLng - (x / 16) * scaleLng]);
 
     // Côté droit (Naelle)
-    heartPointsRight.push([centerLat + (y / 16) * scaleLat + 0.5, centerLng + (x / 16) * scaleLng]);
+    heartPointsRight.push([centerLat + (y / 16) * scaleLat + 1.2, centerLng + (x / 16) * scaleLng]);
   }
 
-  // Étape 1 : Ligne d'approche depuis les villes vers le bas du cœur
-  const approachSteps = 30;
-  const startHeartBaseLeft = heartPointsLeft[heartPointsLeft.length - 1]; // Pointe bas
-  const startHeartBaseRight = heartPointsRight[heartPointsRight.length - 1]; // Pointe bas
+  // Étape 1 : Approche des villes vers la pointe inférieure du cœur
+  const approachSteps = 35;
+  const startHeartBaseLeft = heartPointsLeft[heartPointsLeft.length - 1];  // Pointe du bas
+  const startHeartBaseRight = heartPointsRight[heartPointsRight.length - 1]; // Pointe du bas
 
   const fullPathWael = [];
   const fullPathNaelle = [];
 
-  // Trajet Wael : Tanger -> Pointe bas -> Remontée boucle gauche
+  // Trajet Wael : Tanger -> Pointe bas -> Boucle gauche
   for (let i = 0; i <= approachSteps; i++) {
     const progress = i / approachSteps;
     const lat = tangerCoords[0] + (startHeartBaseLeft[0] - tangerCoords[0]) * progress;
@@ -69,7 +69,7 @@ setTimeout(() => {
     fullPathWael.push(heartPointsLeft[i]);
   }
 
-  // Trajet Naelle : France -> Pointe bas -> Remontée boucle droite
+  // Trajet Naelle : France -> Pointe bas -> Boucle droite
   for (let i = 0; i <= approachSteps; i++) {
     const progress = i / approachSteps;
     const lat = targetCoords[0] + (startHeartBaseRight[0] - targetCoords[0]) * progress;
@@ -83,7 +83,7 @@ setTimeout(() => {
   let step = 0;
   const totalSteps = fullPathWael.length;
 
-  // Animation synchrone parfaite
+  // Animation synchrone
   const animInterval = setInterval(() => {
     if (step < totalSteps) {
       lineWael.addLatLng(fullPathWael[step]);
@@ -98,7 +98,7 @@ setTimeout(() => {
       setTimeout(() => document.getElementById('poem').classList.add('visible'), 4000);
       setTimeout(() => document.getElementById('next-btn').classList.remove('hidden'), 5500);
     }
-  }, 30);
+  }, 25);
 
 }, 1000);
 
@@ -107,7 +107,7 @@ function goToNextScreen(screenId) {
   document.getElementById(screenId).classList.add('active');
 }
 
-// Message d'erreur réglé sur 10 secondes (10000ms)
+// Piratage de 10 secondes
 function triggerLockError() {
   const hackOverlay = document.getElementById('hack-overlay');
   
