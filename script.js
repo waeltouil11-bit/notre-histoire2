@@ -2,10 +2,10 @@ const monPrenom = "Wael";
 const nomNaelle = "Naelle";
 
 const tangerCoords = [35.7595, -5.8340];
-const targetCoords = [48.8566, 2.3522];
+const targetCoords = [43.6048, -1.0009]; // Coordonnées exactes de Pouillon
 
 // Initialisation de la carte Leaflet
-const map = L.map('map', { zoomControl: false }).setView([42.5, -2.0], 5);
+const map = L.map('map', { zoomControl: false }).setView([41.0, -3.0], 5);
 
 L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
   maxZoom: 19,
@@ -17,22 +17,21 @@ setTimeout(() => {
   const targetMarker = L.circleMarker(targetCoords, { color: '#ff4d6d', fillColor: '#ff758f', fillOpacity: 0.9, radius: 9 }).addTo(map);
 
   tangerMarker.bindTooltip(`📍 Tanger — ${monPrenom}`, { permanent: true, direction: 'top', className: 'custom-name-label' }).openTooltip();
-  targetMarker.bindTooltip(`📍 France — ${nomNaelle}`, { permanent: true, direction: 'top', className: 'custom-name-label' }).openTooltip();
+  targetMarker.bindTooltip(`📍 Pouillon — ${nomNaelle}`, { permanent: true, direction: 'top', className: 'custom-name-label' }).openTooltip();
 
   // Polylines des deux tracés rouges
   const lineWael = L.polyline([], { color: '#ff4d6d', weight: 4.5, opacity: 0.95, lineCap: 'round', lineJoin: 'round' }).addTo(map);
   const lineNaelle = L.polyline([], { color: '#ff4d6d', weight: 4.5, opacity: 0.95, lineCap: 'round', lineJoin: 'round' }).addTo(map);
 
-  // Centre du cœur sur la carte
-  const centerLat = 42.5;
-  const centerLng = -2.0;
+  // Centre du cœur sur la carte (recentré entre Tanger et Pouillon)
+  const centerLat = 40.5;
+  const centerLng = -3.2;
 
-  // Calcul du cœur géant (2x la version précédente)
+  // Calcul du cœur géant
   const stepsHeart = 70;
   const heartPointsLeft = [];
   const heartPointsRight = [];
 
-  // Multiplicateurs d'échelle agrandis (2x la version précédente)
   const scaleLat = 1.32;
   const scaleLng = 1.92;
 
@@ -50,7 +49,7 @@ setTimeout(() => {
     heartPointsRight.push([centerLat + (y / 16) * scaleLat + 2.0, centerLng + (x / 16) * scaleLng]);
   }
 
-  // Étape 1 : Approche des villes vers la pointe inférieure du cœur
+  // Étape 1 : Approche depuis Tanger et Pouillon vers la pointe inférieure du cœur
   const approachSteps = 40;
   const startHeartBaseLeft = heartPointsLeft[heartPointsLeft.length - 1];  // Pointe du bas
   const startHeartBaseRight = heartPointsRight[heartPointsRight.length - 1]; // Pointe du bas
@@ -69,7 +68,7 @@ setTimeout(() => {
     fullPathWael.push(heartPointsLeft[i]);
   }
 
-  // Trajet Naelle : France -> Pointe bas -> Boucle droite
+  // Trajet Naelle : Pouillon -> Pointe bas -> Boucle droite
   for (let i = 0; i <= approachSteps; i++) {
     const progress = i / approachSteps;
     const lat = targetCoords[0] + (startHeartBaseRight[0] - targetCoords[0]) * progress;
@@ -91,7 +90,7 @@ setTimeout(() => {
       step++;
     } else {
       clearInterval(animInterval);
-      map.flyTo([centerLat, centerLng], 4, { duration: 2 });
+      map.flyTo([centerLat, centerLng], 5, { duration: 2 });
 
       setTimeout(() => document.getElementById('quote-1').classList.add('visible'), 800);
       setTimeout(() => document.getElementById('quote-2').classList.add('visible'), 2400);
