@@ -12,10 +12,6 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r
   attribution: '© OpenStreetMap'
 }).addTo(map);
 
-// Coordonnées du centre (jonction de la pointe du bas du cœur)
-const midLat = 40.5;
-const midLng = -1.7;
-
 setTimeout(() => {
   const tangerMarker = L.circleMarker(tangerCoords, { color: '#ff4d6d', fillColor: '#ff758f', fillOpacity: 0.9, radius: 9 }).addTo(map);
   const targetMarker = L.circleMarker(targetCoords, { color: '#ff4d6d', fillColor: '#ff758f', fillOpacity: 0.9, radius: 9 }).addTo(map);
@@ -23,37 +19,68 @@ setTimeout(() => {
   tangerMarker.bindTooltip(`📍 Tanger — ${monPrenom}`, { permanent: true, direction: 'top', className: 'custom-name-label' }).openTooltip();
   targetMarker.bindTooltip(`📍 France — ${nomNaelle}`, { permanent: true, direction: 'top', className: 'custom-name-label' }).openTooltip();
 
-  // Ligne de Wael (part de Tanger vers la gauche du cœur)
-  const lineWael = L.polyline([], { color: '#ff4d6d', weight: 4.5, opacity: 0.95, lineCap: 'round' }).addTo(map);
-  // Ligne de Naelle (part de France vers la droite du cœur)
-  const lineNaelle = L.polyline([], { color: '#ff4d6d', weight: 4.5, opacity: 0.95, lineCap: 'round' }).addTo(map);
+  // Deux lignes distinctes qui se construisent en même temps
+  const lineWael = L.polyline([], { color: '#ff4d6d', weight: 4.5, opacity: 0.95, lineCap: 'round', lineJoin: 'round' }).addTo(map);
+  const lineNaelle = L.polyline([], { color: '#ff4d6d', weight: 4.5, opacity: 0.95, lineCap: 'round', lineJoin: 'round' }).addTo(map);
 
-  let progress = 0;
-  const totalSteps = 100;
+  // Points clés pour la trajectoire de Wael (Moitié gauche du cœur)
+  const pathWaelControl = [
+    tangerCoords,      // Départ : Tanger
+    [41.0, -4.5],      // Croisement bas
+    [45.5, -6.0],      // Bosse gauche du cœur
+    [43.5, -2.5]       // Creux central (Fin)
+  ];
 
-  const heartInterval = setInterval(() => {
-    progress++;
-    const t = (progress / totalSteps) * Math.PI;
+  // Points clés pour la trajectoire de Naelle (Moitié droite du cœur)
+  const pathNaelleControl = [
+    targetCoords,      // Départ : France
+    [41.0, -0.5],      // Croisement bas
+    [46.5, -0.2],      // Bosse droite du cœur
+    [43.5, -2.5]       // Creux central (Fin)
+  ];
 
-    // Calcul courbe gauche (Wael)
-    const xLeft = -14 * Math.pow(Math.sin(t), 3);
-    const yLeft = 11 * Math.cos(t) - 4 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
-    
-    // Calcul courbe droite (Naelle)
-    const xRight = 14 * Math.pow(Math.sin(t), 3);
-    const yRight = 11 * Math.cos(t) - 4 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
+  // Interpolation de courbe (Catmull-Rom)
+  function getInterpolatedPoints(points, samples) {
+    const result = [];
+    for (let i = 0; i < points.length - 1; i++) {
+      const p0 = points[Math.max(0, i - 1)];
+      const p1 = points[i];
+      const p2 = points[i + 1];
+      const p3 = points[Math.min(points.length - 1, i + 2)];
 
-    // Ajustement des trajectoires depuis Tanger et France
-    const latW = tangerCoords[0] + (midLat + yLeft * 0.45 - tangerCoords[0]) * (progress / totalSteps);
-    const lngW = tangerCoords[1] + (midLng + xLeft * 0.45 - tangerCoords[1]) * (progress / totalSteps);
-    lineWael.addLatLng([latW, lngW]);
+      for (let t = 0; t < 1; t += 1 / samples) {
+        const t2 = t * t;
+        const t3 = t2 * t;
 
-    const latN = targetCoords[0] + (midLat + yRight * 0.45 - targetCoords[0]) * (progress / totalSteps);
-    const lngN = targetCoords[1] + (midLng + xRight * 0.45 - targetCoords[1]) * (progress / totalSteps);
-    lineNaelle.addLatLng([latN, lngN]);
+        const lat = 0.5 * ((2 * p1[0]) + (-p0[0] + p2[0]) * t + (2 * p0[0] - 5 * p1[0] + 4 * p2[0] - p3[0]) * t2 + (-p0[0] + 3 * p1[0] - 3 * p2[0] + p3[0]) * t3);
+        const lng = 0.5 * ((2 * p1[1]) + (-p0[1] + p2[1]) * t + (2 * p0[1] - 5 * p1[1] + 4 * p2[1] - p3[1]) * t2 + (-p0[1] + 3 * p1[1] - 3 * p2[1] + p3[1]) * t3);
 
-    if (progress >= totalSteps) {
-      clearInterval(heartInterval);
+        result.push([lat, lng]);
+      }
+    }
+    result.push(points[points.length - 1]);
+    return result;
+  }
+
+  const fullPathWael = getInterpolatedPoints(pathWaelControl, 40);
+  const fullPathNaelle = getInterpolatedPoints(pathNaelleControl, 40);
+
+  let step = 0;
+  const maxSteps = Math.max(fullPathWael.length, fullPathNaelle.length);
+
+  // Animation synchrone des deux lignes
+  const animInterval = setInterval(() => {
+    if (step < fullPathWael.length) {
+      lineWael.addLatLng(fullPathWael[step]);
+    }
+    if (step < fullPathNaelle.length) {
+      lineNaelle.addLatLng(fullPathNaelle[step]);
+    }
+
+    step++;
+
+    if (step >= maxSteps) {
+      clearInterval(animInterval);
       map.flyTo([42, -1], 5, { duration: 2 });
 
       setTimeout(() => document.getElementById('quote-1').classList.add('visible'), 800);
@@ -61,7 +88,7 @@ setTimeout(() => {
       setTimeout(() => document.getElementById('poem').classList.add('visible'), 4000);
       setTimeout(() => document.getElementById('next-btn').classList.remove('hidden'), 5500);
     }
-  }, 35);
+  }, 30);
 
 }, 1000);
 
@@ -70,7 +97,7 @@ function goToNextScreen(screenId) {
   document.getElementById(screenId).classList.add('active');
 }
 
-// Fonction du piratage (exactement 10 secondes = 10000ms)
+// Piratage de 10 secondes
 function triggerLockError() {
   const hackOverlay = document.getElementById('hack-overlay');
   
