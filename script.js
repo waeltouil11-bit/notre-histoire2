@@ -5,7 +5,7 @@ const tangerCoords = [35.7595, -5.8340];
 const targetCoords = [48.8566, 2.3522];
 
 // Initialisation de la carte Leaflet
-const map = L.map('map', { zoomControl: false }).setView([42, -1], 5);
+const map = L.map('map', { zoomControl: false }).setView([42.5, -1.8], 5);
 
 L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
   maxZoom: 19,
@@ -19,27 +19,31 @@ setTimeout(() => {
   tangerMarker.bindTooltip(`📍 Tanger — ${monPrenom}`, { permanent: true, direction: 'top', className: 'custom-name-label' }).openTooltip();
   targetMarker.bindTooltip(`📍 France — ${nomNaelle}`, { permanent: true, direction: 'top', className: 'custom-name-label' }).openTooltip();
 
-  // Deux lignes dessinées simultanément
+  // Polylines pour l'animation synchrone
   const lineWael = L.polyline([], { color: '#ff4d6d', weight: 4.5, opacity: 0.95, lineCap: 'round', lineJoin: 'round' }).addTo(map);
   const lineNaelle = L.polyline([], { color: '#ff4d6d', weight: 4.5, opacity: 0.95, lineCap: 'round', lineJoin: 'round' }).addTo(map);
 
-  // Points de passage pour la trajectoire de Wael (Part de Tanger -> Croise à droite -> Bosse droite -> Creux central)
+  // Centre exact du cœur
+  const centerLat = 42.5;
+  const centerLng = -1.8;
+
+  // Trajectoire Wael : Tanger -> Bas du cœur (croisement) -> Bosse Gauche -> Creux du Cœur
   const pathWaelControl = [
-    tangerCoords,      // Départ : Tanger (Bas-Gauche)
-    [40.5, 0.5],       // Point de croisement bas (Vers la droite)
-    [46.5, 0.8],       // Bosse droite du cœur
-    [44.0, -2.5]       // Creux central (Jonction)
+    tangerCoords,
+    [centerLat - 2.5, centerLng],     // Pointe bas du cœur (point de croisement)
+    [centerLat + 1.2, centerLng - 3.2], // Bosse supérieure gauche
+    [centerLat - 0.2, centerLng]      // Creux supérieur du cœur (Jonction)
   ];
 
-  // Points de passage pour la trajectoire de Naelle (Part de France -> Croise à gauche -> Bosse gauche -> Creux central)
+  // Trajectoire Naelle : France -> Bas du cœur (croisement) -> Bosse Droite -> Creux du Cœur
   const pathNaelleControl = [
-    targetCoords,      // Départ : France (Haut-Droit)
-    [40.5, -5.5],      // Point de croisement bas (Vers la gauche)
-    [45.5, -5.8],      // Bosse gauche du cœur
-    [44.0, -2.5]       // Creux central (Jonction)
+    targetCoords,
+    [centerLat - 2.5, centerLng],     // Pointe bas du cœur (point de croisement)
+    [centerLat + 1.2, centerLng + 3.2], // Bosse supérieure droite
+    [centerLat - 0.2, centerLng]      // Creux supérieur du cœur (Jonction)
   ];
 
-  // Générateur de trajectoire fluide (Interpolation Bézier / Catmull-Rom)
+  // Interpolation fluide (Bézier / Catmull-Rom)
   function getInterpolatedPoints(points, samples) {
     const result = [];
     for (let i = 0; i < points.length - 1; i++) {
@@ -62,13 +66,13 @@ setTimeout(() => {
     return result;
   }
 
-  const fullPathWael = getInterpolatedPoints(pathWaelControl, 50);
-  const fullPathNaelle = getInterpolatedPoints(pathNaelleControl, 50);
+  const fullPathWael = getInterpolatedPoints(pathWaelControl, 45);
+  const fullPathNaelle = getInterpolatedPoints(pathNaelleControl, 45);
 
   let step = 0;
   const maxSteps = Math.max(fullPathWael.length, fullPathNaelle.length);
 
-  // Animation synchrone exacte
+  // Animation simultanée
   const animInterval = setInterval(() => {
     if (step < fullPathWael.length) {
       lineWael.addLatLng(fullPathWael[step]);
@@ -81,7 +85,7 @@ setTimeout(() => {
 
     if (step >= maxSteps) {
       clearInterval(animInterval);
-      map.flyTo([42, -1], 5, { duration: 2 });
+      map.flyTo([centerLat, centerLng], 5, { duration: 2 });
 
       setTimeout(() => document.getElementById('quote-1').classList.add('visible'), 800);
       setTimeout(() => document.getElementById('quote-2').classList.add('visible'), 2400);
@@ -97,7 +101,7 @@ function goToNextScreen(screenId) {
   document.getElementById(screenId).classList.add('active');
 }
 
-// Piratage de 10 secondes
+// Message d'erreur réglé sur 10 secondes (10000ms)
 function triggerLockError() {
   const hackOverlay = document.getElementById('hack-overlay');
   
